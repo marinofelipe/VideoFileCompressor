@@ -13,6 +13,8 @@ class ViewController: UIViewController {
 
     @IBOutlet weak var recordingView: UIView!
     
+    private var session: AVCaptureSession?
+    private var movieOutput : AVCaptureMovieFileOutput = AVCaptureMovieFileOutput()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,7 +36,21 @@ class ViewController: UIViewController {
         CameraStatus.checkIfCameraIsAuthorized { (cameraStatus) in
             
             if cameraStatus == .authorized {
-                print("Authorized")
+                CameraUtil().settingAVCaptureSessionCamera(completion: { (session, movieOutput, previewLayer) in
+                    
+                    guard let viewLayer = previewLayer else { return }
+                    guard let session   = session else { return }
+                    guard let output    = movieOutput else { return }
+                    
+                    viewLayer.frame = self.recordingView.bounds
+
+                    self.recordingView.layer.addSublayer(viewLayer)
+                    self.movieOutput = output
+                    self.session = session
+                    
+                    session.commitConfiguration()
+                    session.startRunning()
+                })
             }
         }
 
