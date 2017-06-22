@@ -7,12 +7,19 @@
 //
 
 import UIKit
+import AVFoundation
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var recordingView: UIView!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        self.title = "Record Movie"
+        
+        setCamera()
     }
 
     override func didReceiveMemoryWarning() {
@@ -20,6 +27,17 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
+    // MARK: CAMERA
+    private func setCamera() {
+        
+        
+        CameraStatus.checkIfCameraIsAuthorized { (cameraStatus) in
+            
+            if cameraStatus == .authorized {
+                print("Authorized")
+            }
+        }
 
+    }
 }
 
