@@ -72,7 +72,7 @@ public class CameraUtil: NSObject {
         return nil
     }
     
-    public func tempPathMovie (fileName: String) -> NSURL {
+    public func tempPathMovie (fileName: String) -> URL? {
         
         let path = URL.init(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName).appendingPathExtension(KPathExtension).absoluteString
         if FileManager.default.fileExists(atPath: path) {
@@ -81,6 +81,11 @@ public class CameraUtil: NSObject {
                 
             } catch { print("") }
         }
-        return NSURL(string: path)!
+        
+        if let url = URL(string: path) {
+            return url
+        }
+        
+        return nil
     }
 }

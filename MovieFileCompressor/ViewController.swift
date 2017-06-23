@@ -10,11 +10,12 @@ import UIKit
 import AVFoundation
 
 class ViewController: UIViewController {
-
-    @IBOutlet weak var recordingView: UIView!
     
+    private var mainView: MainView {
+        return self.view as! MainView
+    }
     private var session: AVCaptureSession?
-    private var movieOutput : AVCaptureMovieFileOutput = AVCaptureMovieFileOutput()
+    internal var movieOutput : AVCaptureMovieFileOutput = AVCaptureMovieFileOutput()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,6 +23,7 @@ class ViewController: UIViewController {
         self.title = "Record Movie"
         
         setCamera()
+        mainView.videoDelegate = self
     }
 
     override func didReceiveMemoryWarning() {
@@ -42,9 +44,9 @@ class ViewController: UIViewController {
                     guard let session   = session else { return }
                     guard let output    = movieOutput else { return }
                     
-                    viewLayer.frame = self.recordingView.bounds
+                    viewLayer.frame = self.mainView.cameraView.bounds
 
-                    self.recordingView.layer.addSublayer(viewLayer)
+                    self.mainView.cameraView.layer.addSublayer(viewLayer)
                     self.movieOutput = output
                     self.session = session
                     
@@ -53,7 +55,32 @@ class ViewController: UIViewController {
                 })
             }
         }
+    }
+}
 
+extension ViewController: VideoDelegate {
+    
+    func willStartRecording() {
+        let name = "Video\(arc4random_uniform(100))"
+        if let url = CameraUtil().tempPathMovie(fileName: name) {
+            movieOutput.startRecording(toOutputFileURL: url, recordingDelegate: self)
+        }
+    }
+    
+    func didFinishRecording() {
+        print("didFinishRecroding")
+        movieOutput.stopRecording()
+    }
+}
+
+extension ViewController: AVCaptureFileOutputRecordingDelegate {
+    
+    func capture(_ captureOutput: AVCaptureFileOutput!, didStartRecordingToOutputFileAt fileURL: URL!, fromConnections connections: [Any]!) {
+        print("didStartRecordingToOutputFile")
+    }
+    
+    func capture(_ captureOutput: AVCaptureFileOutput!, didFinishRecordingToOutputFileAt outputFileURL: URL!, fromConnections connections: [Any]!, error: Error!) {
+        print("didFinishRecordingToOutputFile")
     }
 }
 
