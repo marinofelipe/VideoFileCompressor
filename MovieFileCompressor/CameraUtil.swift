@@ -90,95 +90,151 @@ public class CameraUtil: NSObject {
     
     public func convertVideoToLowQuality(withInputURL inputURL: URL, outputURL: URL, bitRate: Int, handler: @escaping (_ compressedURL: URL) -> Void) {
         var videoAsset: AVURLAsset? = AVURLAsset(url: inputURL, options: nil)
-        var videoTrack: AVAssetTrack?  = videoAsset!.tracks(withMediaType: AVMediaTypeVideo)[0]
-        //        let videoSize = videoTrack.naturalSize
-        var videoWriterCompressionSettings: Dictionary? = [
-            AVVideoAverageBitRateKey : Int(bitRate)
-        ]
         
-        var videoWriterSettings :[String : AnyObject]? = [
-            AVVideoCodecKey : AVVideoCodecH264 as AnyObject,
-            AVVideoCompressionPropertiesKey : videoWriterCompressionSettings! as AnyObject,
-            AVVideoWidthKey : Int(1280) as AnyObject,
-            AVVideoHeightKey : Int(720) as AnyObject
-        ]
-        
-        var videoWriterInput: AVAssetWriterInput? = AVAssetWriterInput(mediaType: AVMediaTypeVideo, outputSettings: videoWriterSettings)
-        videoWriterInput!.expectsMediaDataInRealTime = true
-        videoWriterInput!.transform = videoTrack!.preferredTransform
-        var videoWriter: AVAssetWriter? = try! AVAssetWriter(outputURL: outputURL, fileType: AVFileTypeQuickTimeMovie)
-        videoWriter!.add(videoWriterInput!)
-        //setup video reader
-        var videoReaderSettings:[String : AnyObject]? = [
-            kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange) as AnyObject
-        ]
-        
-        var videoReaderOutput: AVAssetReaderTrackOutput? = AVAssetReaderTrackOutput(track: videoTrack!, outputSettings: videoReaderSettings)
-        var videoReader: AVAssetReader? = try! AVAssetReader(asset: videoAsset!)
-        videoReader!.add(videoReaderOutput!)
-        //setup audio writer
-        var audioWriterInput: AVAssetWriterInput? = AVAssetWriterInput(mediaType: AVMediaTypeAudio, outputSettings: nil)
-        audioWriterInput!.expectsMediaDataInRealTime = false
-        videoWriter!.add(audioWriterInput!)
-        //setup audio reader
-        var audioTrack: AVAssetTrack? = videoAsset!.tracks(withMediaType: AVMediaTypeAudio)[0]
-        var audioReaderOutput: AVAssetReaderTrackOutput? = AVAssetReaderTrackOutput(track: audioTrack!, outputSettings: nil)
-        var audioReader: AVAssetReader? = try! AVAssetReader(asset: videoAsset!)
-        audioReader!.add(audioReaderOutput!)
-        videoWriter!.startWriting()
-        
-        //start writing from video reader
-        videoReader!.startReading()
-        videoWriter!.startSession(atSourceTime: kCMTimeZero)
-        let processingQueue = DispatchQueue(label: "processingQueue1")
-        videoWriterInput!.requestMediaDataWhenReady(on: processingQueue, using: {() -> Void in
-            while videoWriterInput!.isReadyForMoreMediaData {
-                let sampleBuffer:CMSampleBuffer? = videoReaderOutput!.copyNextSampleBuffer();
-                if videoReader!.status == .reading && sampleBuffer != nil {
-                    videoWriterInput!.append(sampleBuffer!)
-                }
-                else {
-                    videoWriterInput!.markAsFinished()
+        if let vidAsset = videoAsset {
+            var videoTrack: AVAssetTrack?  = vidAsset.tracks(withMediaType: AVMediaTypeVideo)[0]
+            
+            var videoWriterCompressionSettings: Dictionary? = [
+                AVVideoAverageBitRateKey : Int(bitRate)
+            ]
+            
+            if let vidWritterCompressionSettings = videoWriterCompressionSettings {
+                var videoWriterSettings :[String : AnyObject]? = [
+                    AVVideoCodecKey : AVVideoCodecH264 as AnyObject,
+                    AVVideoCompressionPropertiesKey : vidWritterCompressionSettings as AnyObject,
+                    AVVideoWidthKey : Int(1280) as AnyObject,
+                    AVVideoHeightKey : Int(720) as AnyObject
+                ]
+                
+                if let vidTrack = videoTrack {
+                    var videoWriterInput: AVAssetWriterInput? = AVAssetWriterInput(mediaType: AVMediaTypeVideo, outputSettings: videoWriterSettings)
                     
-                    if videoReader!.status == .completed {
-                        //start writing from audio reader
-                        audioReader!.startReading()
-                        videoWriter!.startSession(atSourceTime: kCMTimeZero)
-                        let processingQueue = DispatchQueue(label: "processingQueue2")
-                        audioWriterInput!.requestMediaDataWhenReady(on: processingQueue, using: {() -> Void in
-                            while audioWriterInput!.isReadyForMoreMediaData {
-                                let sampleBuffer:CMSampleBuffer? = audioReaderOutput!.copyNextSampleBuffer()
-                                if audioReader!.status == .reading && sampleBuffer != nil {
-                                    audioWriterInput!.append(sampleBuffer!)
-                                }
-                                else {
-                                    audioWriterInput!.markAsFinished()
-                                    if audioReader!.status == .completed {
+                    if let vidWriterInput = videoWriterInput {
+                        vidWriterInput.expectsMediaDataInRealTime = true
+                        vidWriterInput.transform = videoTrack!.preferredTransform
+                        
+                        do {
+                            var videoWriter: AVAssetWriter? = try AVAssetWriter(outputURL: outputURL, fileType: AVFileTypeQuickTimeMovie)
+                            
+                            if let vidWriter = videoWriter {
+                                vidWriter.add(videoWriterInput!)
+                                
+                                //setup video reader
+                                var videoReaderSettings:[String : AnyObject]? = [
+                                    kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange) as AnyObject
+                                ]
+                                
+                                var videoReaderOutput: AVAssetReaderTrackOutput? = AVAssetReaderTrackOutput(track: vidTrack, outputSettings: videoReaderSettings)
+                                
+                                if let vidReaderOutput = videoReaderOutput {
+                                    do {
+                                        var videoReader: AVAssetReader? = try AVAssetReader(asset: vidAsset)
                                         
-                                        videoWriter!.finishWriting(completionHandler: {() -> Void in
-                                            videoAsset = nil
-                                            videoReader = nil
-                                            videoWriter = nil
-                                            videoWriterInput = nil
-                                            videoReaderOutput = nil
-                                            videoTrack = nil
-                                            videoWriterCompressionSettings = nil
-                                            videoReaderSettings = nil
-                                            videoWriterSettings = nil
-                                            audioReader = nil
-                                            audioWriterInput = nil
-                                            audioTrack = nil
-                                            audioReaderOutput = nil
+                                        if let vidReader = videoReader {
+                                            vidReader.add(vidReaderOutput)
                                             
-                                            handler(outputURL)
-                                        })
+                                            //setup audio writer
+                                            var audioWriterInput: AVAssetWriterInput? = AVAssetWriterInput(mediaType: AVMediaTypeAudio, outputSettings: nil)
+                                            
+                                            if let audWriterInput = audioWriterInput {
+                                                audWriterInput.expectsMediaDataInRealTime = false
+                                                vidWriter.add(audWriterInput)
+                                                
+                                                //setup audio reader
+                                                var audioTrack: AVAssetTrack? = vidAsset.tracks(withMediaType: AVMediaTypeAudio)[0]
+                                                
+                                                if let audTrack = audioTrack {
+                                                    var audioReaderOutput: AVAssetReaderTrackOutput? = AVAssetReaderTrackOutput(track: audTrack, outputSettings: nil)
+                                                    
+                                                    if let audReaderOutput = audioReaderOutput {
+                                                        do {
+                                                            var audioReader: AVAssetReader? = try AVAssetReader(asset: vidAsset)
+                                                            
+                                                            if let audReader = audioReader {
+                                                                audReader.add(audReaderOutput)
+                                                                vidWriter.startWriting()
+                                                                
+                                                                //start writing from video reader
+                                                                vidReader.startReading()
+                                                                vidWriter.startSession(atSourceTime: kCMTimeZero)
+                                                                
+                                                                
+                                                                let processingQueue = DispatchQueue(label: "processingQueue1")
+                                                                vidWriterInput.requestMediaDataWhenReady(on: processingQueue, using: {() -> Void in
+                                                                    while vidWriterInput.isReadyForMoreMediaData {
+                                                                        let sampleBuffer:CMSampleBuffer? = vidReaderOutput.copyNextSampleBuffer();
+                                                                        if vidReader.status == .reading && sampleBuffer != nil {
+                                                                            if let sBuffer = sampleBuffer {
+                                                                                vidWriterInput.append(sBuffer)
+                                                                            }
+                                                                        }
+                                                                        else {
+                                                                            vidWriterInput.markAsFinished()
+                                                                            
+                                                                            if vidReader.status == .completed {
+                                                                                //start writing from audio reader
+                                                                                audReader.startReading()
+                                                                                vidWriter.startSession(atSourceTime: kCMTimeZero)
+                                                                                let processingQueue = DispatchQueue(label: "processingQueue2")
+                                                                                audWriterInput.requestMediaDataWhenReady(on: processingQueue, using: {() -> Void in
+                                                                                    while audWriterInput.isReadyForMoreMediaData {
+                                                                                        let sampleBuffer:CMSampleBuffer? = audReaderOutput.copyNextSampleBuffer()
+                                                                                        if audReader.status == .reading && sampleBuffer != nil {
+                                                                                            if let sBuffer = sampleBuffer {
+                                                                                                audWriterInput.append(sBuffer)
+                                                                                            }
+                                                                                        }
+                                                                                        else {
+                                                                                            audWriterInput.markAsFinished()
+                                                                                            if audReader.status == .completed {
+                                                                                                
+                                                                                                vidWriter.finishWriting(completionHandler: {() -> Void in
+                                                                                                    videoAsset = nil
+                                                                                                    videoReader = nil
+                                                                                                    videoWriter = nil
+                                                                                                    videoWriterInput = nil
+                                                                                                    videoReaderOutput = nil
+                                                                                                    videoTrack = nil
+                                                                                                    videoWriterCompressionSettings = nil
+                                                                                                    videoReaderSettings = nil
+                                                                                                    videoWriterSettings = nil
+                                                                                                    audioReader = nil
+                                                                                                    audioWriterInput = nil
+                                                                                                    audioTrack = nil
+                                                                                                    audioReaderOutput = nil
+                                                                                                    
+                                                                                                    handler(outputURL)
+                                                                                                })
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                })
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                })
+                                                            }
+                                                        }
+                                                        catch {
+                                                            print("error on Audio Reader")
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    catch {
+                                        print("error on VideoReader")
                                     }
                                 }
                             }
-                        })
+                        }
+                        catch {
+                            print("error on Video Writer")
+                        }
                     }
                 }
             }
-        })
+        }
     }
 }
