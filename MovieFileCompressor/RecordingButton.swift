@@ -21,16 +21,8 @@ class RecordingButton: UIButton {
     private var circleBorder: CALayer!
     var recordingState: RecordingState = .stopped {
         didSet {
-            switch recordingState {
-            case .recording:
-                recording(true)
-                stopped(false)
-                break
-            case .stopped:
-                recording(false)
-                stopped(true)
-                break
-            }
+            animateButtonBorder()
+            animateButtonState()
         }
     }
 
@@ -66,99 +58,81 @@ class RecordingButton: UIButton {
 
     
     // MARK: State handlers
-    private func recording(_ recording: Bool) {
-        print("recording")
-        
-        let duration: TimeInterval        = 0.15
+    private func animateButtonBorder() {
         self.circleLayer.contentsGravity    = "center"
         
         let borderColor: CABasicAnimation   = CABasicAnimation(keyPath: "borderColor")
-        borderColor.duration                = duration
+        borderColor.duration                = 0.15
         borderColor.fillMode                = kCAFillModeForwards
         borderColor.isRemovedOnCompletion     = false
         
         let borderScale                     = CABasicAnimation(keyPath: "transform.scale")
-        borderScale.fromValue               = recording ? 1.0 : 0.88
-        borderScale.toValue                 = recording ? 0.88 : 1.0
-        borderScale.duration                = duration
+        borderScale.fromValue               = recordingState == .recording ? 1.0 : 0.88
+        borderScale.toValue                 = recordingState == .recording ? 0.88 : 1.0
+        borderScale.duration                = 0.15
         borderScale.fillMode                = kCAFillModeForwards
         borderScale.isRemovedOnCompletion     = false
+        
         
         let borderAnimations                    = CAAnimationGroup()
         borderAnimations.isRemovedOnCompletion    = false
         borderAnimations.fillMode               = kCAFillModeForwards
-        borderAnimations.duration               = duration
+        borderAnimations.duration               = 0.15
         borderAnimations.animations             = [borderColor, borderScale]
-        
-        let fade                    = CABasicAnimation(keyPath: "opacity")
-        fade.fromValue              = recording ? 0.0 : 1.0
-        fade.toValue                = recording ? 1.0 : 0.0
-        fade.duration               = duration
-        fade.fillMode               = kCAFillModeForwards
-        fade.isRemovedOnCompletion    = false
 
         circleBorder.add(borderAnimations, forKey: "borderAnimations")
     }
     
-    private func stopped(_ stopped: Bool) {
-        print("stopped")
-        let duration: TimeInterval        = 0.15
+    private func animateButtonState() {
         self.circleLayer.contentsGravity    = "center"
         
         let scale                   = CABasicAnimation(keyPath: "transform.scale")
-        scale.fromValue             = !stopped ? 1.0 : 0.88
-        scale.toValue               = !stopped ? 0.88 : 1
-        scale.duration              = duration
+        scale.fromValue             = recordingState == .recording ? 1.0 : 0.88
+        scale.toValue               = recordingState == .recording ? 0.88 : 1
+        scale.duration              = 0.15
         scale.fillMode              = kCAFillModeForwards
         scale.isRemovedOnCompletion   = false
         
         let color                   = CABasicAnimation(keyPath: "backgroundColor")
-        color.duration              = duration
+        color.duration              = 0.15
         color.fillMode              = kCAFillModeForwards
         color.isRemovedOnCompletion   = false
         color.toValue               = UIColor.red.cgColor
         
         
         var square: CAKeyframeAnimation!
-        if !stopped {
+        if recordingState == .recording {
             
-            scale.fromValue             = !stopped ? 1.0 : 0.68
-            scale.toValue               = !stopped ? 0.68 : 1
+            scale.fromValue             = recordingState == .recording ? 1.0 : 0.68
+            scale.toValue               = recordingState == .recording ? 0.68 : 1
             
             square                       = CAKeyframeAnimation(keyPath: "cornerRadius")
-            square.duration              = duration
+            square.duration              = 0.15
             square.fillMode              = kCAFillModeForwards
             square.isRemovedOnCompletion   = false
-            square.path                  = !stopped ? squarePathWithCenter(center: CGPoint(x: 0, y: 0), side: 0).cgPath : circlePathWithCenter(center: CGPoint(x: 0, y: 0), radius: 90).cgPath
+            square.path                  = recordingState == .recording ? squarePathWith(center: CGPoint(x: 0, y: 0), side: 0).cgPath : circlePathWith(center: CGPoint(x: 0, y: 0), radius: 90).cgPath
         }
         else{
             
             square                       = CAKeyframeAnimation(keyPath: "pathGuide")
-            square.duration              = duration
+            square.duration              = 0.15
             square.fillMode              = kCAFillModeForwards
             square.isRemovedOnCompletion   = false
-            square.path                  = circlePathWithCenter(center: CGPoint(x: 0, y: 0), radius: 90).cgPath
+            square.path                  = circlePathWith(center: CGPoint(x: 0, y: 0), radius: 90).cgPath
         }
         
         
         let circleAnimations                    = CAAnimationGroup()
         circleAnimations.isRemovedOnCompletion    = false
         circleAnimations.fillMode               = kCAFillModeForwards
-        circleAnimations.duration               = duration
+        circleAnimations.duration               = 0.15
         circleAnimations.animations             = [scale, color, square]
         
-        
-        let fade                    = CABasicAnimation(keyPath: "opacity")
-        fade.fromValue              = !stopped ? 0.0 : 1.0
-        fade.toValue                = !stopped ? 1.0 : 0.0
-        fade.duration               = duration
-        fade.fillMode               = kCAFillModeForwards
-        fade.isRemovedOnCompletion    = false
         
         self.circleLayer.add(circleAnimations, forKey: "circleAnimations")
     }
     
-    func squarePathWithCenter(center: CGPoint, side: CGFloat) -> UIBezierPath {
+    func squarePathWith(center: CGPoint, side: CGFloat) -> UIBezierPath {
         let squarePath = UIBezierPath()
         let startX = center.x - side / 2
         let startY = center.y - side / 2
@@ -174,7 +148,7 @@ class RecordingButton: UIButton {
         return squarePath
     }
     
-    func circlePathWithCenter(center: CGPoint, radius: CGFloat) -> UIBezierPath {
+    func circlePathWith(center: CGPoint, radius: CGFloat) -> UIBezierPath {
         let circlePath = UIBezierPath()
         circlePath.addArc(withCenter: center, radius: radius, startAngle: -CGFloat(M_PI), endAngle: -CGFloat(M_PI/2), clockwise: true)
         circlePath.addArc(withCenter: center, radius: radius, startAngle: -CGFloat(M_PI/2), endAngle: 0, clockwise: true)
