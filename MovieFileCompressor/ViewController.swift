@@ -16,6 +16,7 @@ class ViewController: UIViewController {
     }
     private var session: AVCaptureSession?
     internal var movieOutput: AVCaptureMovieFileOutput = AVCaptureMovieFileOutput()
+    internal weak var cameraUtil = CameraUtil()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,7 +38,7 @@ class ViewController: UIViewController {
         CameraStatus.checkIfCameraIsAuthorized { (cameraStatus) in
 
             if cameraStatus == .authorized {
-                CameraUtil().settingAVCaptureSessionCamera(completion: { (session, movieOutput, previewLayer) in
+                CameraUtil().setAVCaptureSessionCamera(completion: { (session, movieOutput, previewLayer) in
 
                     guard let viewLayer = previewLayer else { return }
                     guard let session   = session else { return }

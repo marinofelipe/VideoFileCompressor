@@ -35,8 +35,9 @@ class CameraStatus {
         case .notDetermined:
             AVCaptureDevice.requestAccess(forMediaType: cameraMediaType, completionHandler: { (result) in
                 if result {
-                    completion(.notDetermined)
-
+                    DispatchQueue.main.async {
+                        completion(.authorized)
+                    }
                 } else { completion(.notDetermined) }
             })
         }

@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol VideoDelegate {
+protocol VideoDelegate: class {
     func willStartRecording()
     func didFinishRecording()
 }
@@ -20,7 +20,7 @@ class MainView: UIView {
 
     // MARK: - Properties
     private var recordingButton: RecordingButton!
-    var videoDelegate: VideoDelegate?
+    weak var videoDelegate: VideoDelegate?
 
     // Only override draw() if you perform custom drawing.
     // An empty implementation adversely affects performance during animation.

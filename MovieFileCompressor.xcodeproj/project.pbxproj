@@ -136,7 +136,7 @@
 				TargetAttributes = {
 					D5A1592F1EFC499000E5BF19 = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = XRA36B72E4;
+						DevelopmentTeam = X9MK4PBNUW;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -367,10 +367,11 @@
 			baseConfigurationReference = EA7E109806FC30B2CCFC061C /* Pods-MovieFileCompressor.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = XRA36B72E4;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = X9MK4PBNUW;
 				INFOPLIST_FILE = MovieFileCompressor/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = felipemarino.com.MovieFileCompressor;
+				PRODUCT_BUNDLE_IDENTIFIER = marinofelipe.com.MovieFileCompressor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
@@ -381,10 +382,11 @@
 			baseConfigurationReference = 9ADFED0D82DADB5DEE0DFB87 /* Pods-MovieFileCompressor.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = XRA36B72E4;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = X9MK4PBNUW;
 				INFOPLIST_FILE = MovieFileCompressor/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = felipemarino.com.MovieFileCompressor;
+				PRODUCT_BUNDLE_IDENTIFIER = marinofelipe.com.MovieFileCompressor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};

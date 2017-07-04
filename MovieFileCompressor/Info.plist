@@ -20,6 +20,12 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>This apps uses camera to record videos.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need your permission to enable microphone for your videos audio.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This apps access your album to save your small size movie</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -41,11 +47,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSCameraUsageDescription</key>
-	<string>This apps uses camera to record videos.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>We need your permission to enable microphone for your videos audio.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This apps access your album to save your small size movie</string>
 </dict>
 </plist>
