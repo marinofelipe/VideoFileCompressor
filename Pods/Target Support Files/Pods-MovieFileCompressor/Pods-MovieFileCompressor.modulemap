@@ -1,0 +1,6 @@
+framework module Pods_MovieFileCompressor {
+  umbrella header "Pods-MovieFileCompressor-umbrella.h"
+
+  export *
+  module * { export * }
+}

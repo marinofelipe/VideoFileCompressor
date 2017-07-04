@@ -9,34 +9,34 @@
 import Foundation
 import AVFoundation
 
-public typealias CameraActiveStatus = (_ cameraStatus: AVAuthorizationStatus) -> ()
+public typealias CameraActiveStatus = (_ cameraStatus: AVAuthorizationStatus) -> Void
 
 class CameraStatus {
-    
+
     static func checkIfCameraIsAuthorized (completion: @escaping CameraActiveStatus) {
-        
+
         let cameraMediaType             = AVMediaTypeVideo
         let cameraAuthorizationStatus   = AVCaptureDevice.authorizationStatus(forMediaType: cameraMediaType)
-        
+
         switch cameraAuthorizationStatus {
-            
+
         case .authorized:
             completion(.authorized)
             break
-            
+
         case .restricted:
             completion(.restricted)
             break
-            
+
         case .denied:
             completion(.denied)
             break
-            
+
         case .notDetermined:
             AVCaptureDevice.requestAccess(forMediaType: cameraMediaType, completionHandler: { (result) in
                 if result {
                     completion(.notDetermined)
-                    
+
                 } else { completion(.notDetermined) }
             })
         }
