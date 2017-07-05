@@ -107,14 +107,14 @@ class RecordingButton: UIButton {
             square.duration              = 0.15
             square.fillMode              = kCAFillModeForwards
             square.isRemovedOnCompletion   = false
-            square.path                  = recordingState == .recording ? squarePathWith(center: CGPoint(x: 0, y: 0), side: 0).cgPath : circlePathWith(center: CGPoint(x: 0, y: 0), radius: 90).cgPath
+            square.path                  = recordingState == .recording ? squarePath(center: CGPoint.zero, side: 0).cgPath : circlePath(center: CGPoint.zero, radius: 90).cgPath
         } else {
 
             square                       = CAKeyframeAnimation(keyPath: "pathGuide")
             square.duration              = 0.15
             square.fillMode              = kCAFillModeForwards
             square.isRemovedOnCompletion   = false
-            square.path                  = circlePathWith(center: CGPoint(x: 0, y: 0), radius: 90).cgPath
+            square.path                  = circlePath(center: CGPoint(x: 0, y: 0), radius: 90).cgPath
         }
 
         let circleAnimations                    = CAAnimationGroup()
@@ -126,7 +126,7 @@ class RecordingButton: UIButton {
         self.circleLayer.add(circleAnimations, forKey: "circleAnimations")
     }
 
-    func squarePathWith(center: CGPoint, side: CGFloat) -> UIBezierPath {
+    func squarePath(center: CGPoint, side: CGFloat) -> UIBezierPath {
         let squarePath = UIBezierPath()
         let startX = center.x - side / 2
         let startY = center.y - side / 2
@@ -142,7 +142,7 @@ class RecordingButton: UIButton {
         return squarePath
     }
 
-    func circlePathWith(center: CGPoint, radius: CGFloat) -> UIBezierPath {
+    func circlePath(center: CGPoint, radius: CGFloat) -> UIBezierPath {
         let circlePath = UIBezierPath()
         circlePath.addArc(withCenter: center, radius: radius, startAngle: -CGFloat.pi, endAngle: -CGFloat(M_PI/2), clockwise: true)
         circlePath.addArc(withCenter: center, radius: radius, startAngle: -CGFloat(M_PI/2), endAngle: 0, clockwise: true)

@@ -13,6 +13,7 @@ public typealias CameraSession = (
     _ session: AVCaptureSession?,
     _ movieOutput: AVCaptureMovieFileOutput?,
     _ previewLayer: AVCaptureVideoPreviewLayer?) -> Void
+public typealias CompressedFileURL = ((_ : URL) -> Void)
 
 public class CameraUtil: NSObject {
 
@@ -92,7 +93,7 @@ public class CameraUtil: NSObject {
         return nil
     }
 
-    public func convertVideoToLowQuality(withInputURL inputURL: URL, outputURL: URL, bitRate: Int, handler: @escaping (_ compressedURL: URL) -> Void) {
+    public func convertVideoToLowSize(withInputURL inputURL: URL, outputURL: URL, bitRate: Int, handler: @escaping CompressedFileURL) {
         let videoAsset = AVURLAsset(url: inputURL, options: nil)
         let videoTrack = videoAsset.tracks(withMediaType: AVMediaTypeVideo)[0]
         let videoWriterCompressionSettings = [
@@ -131,45 +132,10 @@ public class CameraUtil: NSObject {
                 do {
                     let audioReader: AVAssetReader! = try AVAssetReader(asset: videoAsset)
                     audioReader.add(audioReaderOutput)
-                    videoWriter.startWriting()
-                    //start writing from video reader
-                    videoReader.startReading()
-                    videoWriter.startSession(atSourceTime: kCMTimeZero)
-                    let processingQueue = DispatchQueue(label: "processingQueue1")
-                    videoWriterInput.requestMediaDataWhenReady(on: processingQueue, using: {() -> Void in
-                        while videoWriterInput.isReadyForMoreMediaData {
-                            let sampleBuffer: CMSampleBuffer? = videoReaderOutput.copyNextSampleBuffer()
-                            if videoReader.status == .reading && sampleBuffer != nil {
-                                if let sBuffer = sampleBuffer {
-                                    videoWriterInput.append(sBuffer)
-                                }
-                            } else {
-                                videoWriterInput.markAsFinished()
-                                if videoReader.status == .completed {
-                                    //start writing from audio reader
-                                    audioReader.startReading()
-                                    videoWriter.startSession(atSourceTime: kCMTimeZero)
-                                    let processingQueue = DispatchQueue(label: "processingQueue2")
-                                    audioWriterInput.requestMediaDataWhenReady(on: processingQueue, using: {() -> Void in
-                                        while audioWriterInput.isReadyForMoreMediaData {
-                                            let sampleBuffer: CMSampleBuffer? = audioReaderOutput.copyNextSampleBuffer()
-                                            if audioReader.status == .reading && sampleBuffer != nil {
-                                                if let sBuffer = sampleBuffer {
-                                                    audioWriterInput.append(sBuffer)
-                                                }
-                                            } else {
-                                                audioWriterInput.markAsFinished()
-                                                if audioReader.status == .completed {
-                                                    videoWriter.finishWriting(completionHandler: {() -> Void in
-                                                        handler(outputURL)
-                                                    })
-                                                }
-                                            }
-                                        }
-                                    })
-                                }
-                            }
-                        }
+                    startReadingAndWriting(onOutputURL: outputURL, videoWriter: videoWriter, videoReader: videoReader, videoWriterInput: videoWriterInput,
+                                           videoReaderOutput: videoReaderOutput, audioReader: audioReader, audioWriterInput: audioWriterInput,
+                                           audioReaderOutput: audioReaderOutput, handler: { (compressedFileURL) in
+                        handler(compressedFileURL)
                     })
                 } catch {
                     print("error on Audio Reader")
@@ -180,5 +146,53 @@ public class CameraUtil: NSObject {
         } catch {
             print("error on Video Writer")
         }
+    }
+    
+    //FIXME: Too many parameters
+    // swiftlint:disable function_parameter_count
+    private func startReadingAndWriting(onOutputURL outputURL: URL, videoWriter: AVAssetWriter, videoReader: AVAssetReader,
+                                        videoWriterInput: AVAssetWriterInput, videoReaderOutput: AVAssetReaderTrackOutput,
+                                        audioReader: AVAssetReader, audioWriterInput: AVAssetWriterInput,
+                                        audioReaderOutput: AVAssetReaderTrackOutput, handler:  @escaping CompressedFileURL) {
+        videoWriter.startWriting()
+        //start writing from video reader
+        videoReader.startReading()
+        videoWriter.startSession(atSourceTime: kCMTimeZero)
+        let processingQueue = DispatchQueue(label: "processingQueue1")
+        videoWriterInput.requestMediaDataWhenReady(on: processingQueue, using: {() -> Void in
+            while videoWriterInput.isReadyForMoreMediaData {
+                let sampleBuffer: CMSampleBuffer? = videoReaderOutput.copyNextSampleBuffer()
+                if videoReader.status == .reading && sampleBuffer != nil {
+                    if let sBuffer = sampleBuffer {
+                        videoWriterInput.append(sBuffer)
+                    }
+                } else {
+                    videoWriterInput.markAsFinished()
+                    if videoReader.status == .completed {
+                        //start writing from audio reader
+                        audioReader.startReading()
+                        videoWriter.startSession(atSourceTime: kCMTimeZero)
+                        let processingQueue = DispatchQueue(label: "processingQueue2")
+                        audioWriterInput.requestMediaDataWhenReady(on: processingQueue, using: {() -> Void in
+                            while audioWriterInput.isReadyForMoreMediaData {
+                                let sampleBuffer: CMSampleBuffer? = audioReaderOutput.copyNextSampleBuffer()
+                                if audioReader.status == .reading && sampleBuffer != nil {
+                                    if let sBuffer = sampleBuffer {
+                                        audioWriterInput.append(sBuffer)
+                                    }
+                                } else {
+                                    audioWriterInput.markAsFinished()
+                                    if audioReader.status == .completed {
+                                        videoWriter.finishWriting(completionHandler: {() -> Void in
+                                            handler(outputURL)
+                                        })
+                                    }
+                                }
+                            }
+                        })
+                    }
+                }
+            }
+        })
     }
 }

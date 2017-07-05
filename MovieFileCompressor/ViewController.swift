@@ -82,42 +82,40 @@ extension ViewController: AVCaptureFileOutputRecordingDelegate {
     func capture(_ captureOutput: AVCaptureFileOutput!, didFinishRecordingToOutputFileAt outputFileURL: URL!, fromConnections connections: [Any]!, error: Error!) {
         print("didFinishRecordingToOutputFile")
 
-        if let url = outputFileURL {
-            guard let data = NSData(contentsOf: url) else {
-                return
-            }
-            print("\nFile size before compression: \(Double(data.length / 1048576)) mb")
-
-            let compressedURL = NSURL.fileURL(withPath: url.path.replacingOccurrences(of: ".mov", with: ".mp4"))
-
-            //Using bit rate 900000. Value should be changed to find better file size versus frame quality
-            CameraUtil().convertVideoToLowQuality(withInputURL: url, outputURL: compressedURL, bitRate: 900000, handler: { (compressedURL) in
-                do {
-                    let compressedData = try Data(contentsOf: compressedURL)
-
-                    //remove .mov
-                    if FileManager.default.fileExists(atPath: url.path) {
-                        do {
-                            try FileManager.default.removeItem(at: url)
-                            print("\nfile removed at url \(url.path)")
-                        } catch {
-                            print("\nerror on removing file at url \(url.path)")
-                        }
-                    } else {
-                        print("\nthere are no files at \(url.path)")
-                    }
-
-                    print("\nFile size after compression: \(Double(compressedData.count / 1048576)) mb")
-                    UISaveVideoAtPathToSavedPhotosAlbum(compressedURL.path, nil, nil, nil)
-
-                    DispatchQueue.main.async {
-                        self.showToast(message: "Original file size: \(Double(data.length / 1048576)) mb\nCompressed file size: \(Double(compressedData.count / 1048576)) mb", frame: CGRect(x: self.view.frame.size.width/2 - 150, y: self.view.frame.size.height/2 - 100, width: 300, height: 200), lines: 2)
-                    }
-                } catch {
-                    print("\nerror converting video to low quality")
-                }
-            })
+        guard let videoData = NSData(contentsOf: outputFileURL) else {
+            return
         }
+        print("\nFile size before compression: \(Double(videoData.length / 1048576)) mb")
+
+        let compressedURL = NSURL.fileURL(withPath: outputFileURL.path.replacingOccurrences(of: ".mov", with: ".mp4"))
+
+        //Using bit rate 900000. Value should be changed to find better file size/frame quality
+        CameraUtil().convertVideoToLowSize(withInputURL: outputFileURL, outputURL: compressedURL, bitRate: 900000, handler: { (compressedURL) in
+            do {
+                let compressedData = try Data(contentsOf: compressedURL)
+
+                //remove .mov
+                if FileManager.default.fileExists(atPath: outputFileURL.path) {
+                    do {
+                        try FileManager.default.removeItem(at: outputFileURL)
+                        print("\nfile removed at url \(outputFileURL.path)")
+                    } catch {
+                        print("\nerror on removing file at url \(outputFileURL.path)")
+                    }
+                } else {
+                    print("\nthere are no files at \(outputFileURL.path)")
+                }
+
+                print("\nFile size after compression: \(Double(compressedData.count / 1048576)) mb")
+                UISaveVideoAtPathToSavedPhotosAlbum(compressedURL.path, nil, nil, nil)
+
+                DispatchQueue.main.async {
+                    self.showToast(message: "Original file size: \(Double(videoData.length / 1048576)) mb\nCompressed file size: \(Double(compressedData.count / 1048576)) mb", frame: CGRect(x: self.view.frame.size.width/2 - 150, y: self.view.frame.size.height/2 - 100, width: 300, height: 200), lines: 2)
+                }
+            } catch {
+                print("\nerror converting video to low quality")
+            }
+        })
     }
 }
 
