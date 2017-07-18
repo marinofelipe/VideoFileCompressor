@@ -115,27 +115,29 @@ extension ViewController: AVCaptureFileOutputRecordingDelegate {
         //Using bit rate 900000. Value should be changed to find better file size/frame quality
         CameraUtil().convertVideoToLowSize(withInputURL: outputFileURL, outputURL: compressedURL, bitRate: .veryHigh, handler: { (compressedURL) in
             do {
-                let compressedData = try Data(contentsOf: compressedURL)
-
-                //remove .mov
-                if FileManager.default.fileExists(atPath: outputFileURL.path) {
-                    do {
-                        try FileManager.default.removeItem(at: outputFileURL)
-                        print("\nfile removed at url \(outputFileURL.path)")
-                    } catch {
-                        print("\nerror on removing file at url \(outputFileURL.path)")
+                if let url = compressedURL {
+                    let compressedData = try Data(contentsOf: url)
+                    
+                    //remove .mov
+                    if FileManager.default.fileExists(atPath: outputFileURL.path) {
+                        do {
+                            try FileManager.default.removeItem(at: outputFileURL)
+                            print("\nfile removed at url \(outputFileURL.path)")
+                        } catch {
+                            print("\nerror on removing file at url \(outputFileURL.path)")
+                        }
+                    } else {
+                        print("\nthere are no files at \(outputFileURL.path)")
                     }
-                } else {
-                    print("\nthere are no files at \(outputFileURL.path)")
-                }
-
-                print("\nFile size after compression: \(Double(compressedData.count / 1048576)) mb")
-                UISaveVideoAtPathToSavedPhotosAlbum(compressedURL.path, nil, nil, nil)
-
-                DispatchQueue.main.async {
-                    self.showToast(message: "Original file size: \(Double(videoData.length / 1048576)) mb\nCompressed file size: \(Double(compressedData.count / 1048576)) mb",
-                                   frame: CGRect(x: self.view.frame.size.width/2 - 150, y: self.view.frame.size.height/2 - 100,
-                                   width: 300, height: 200), lines: 2)
+                    
+                    print("\nFile size after compression: \(Double(compressedData.count / 1048576)) mb")
+                    UISaveVideoAtPathToSavedPhotosAlbum(url.path, nil, nil, nil)
+                    
+                    DispatchQueue.main.async {
+                        self.showToast(message: "Original file size: \(Double(videoData.length / 1048576)) mb\nCompressed file size: \(Double(compressedData.count / 1048576)) mb",
+                            frame: CGRect(x: self.view.frame.size.width/2 - 150, y: self.view.frame.size.height/2 - 100,
+                                          width: 300, height: 200), lines: 2)
+                    }
                 }
             } catch {
                 print("\nerror converting video to low quality")

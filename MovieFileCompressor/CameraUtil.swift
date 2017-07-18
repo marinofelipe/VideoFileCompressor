@@ -24,7 +24,7 @@ public typealias CameraSession = (
     _ session: AVCaptureSession?,
     _ movieOutput: AVCaptureMovieFileOutput?,
     _ previewLayer: AVCaptureVideoPreviewLayer?) -> Void
-public typealias CompressedFileURL = ((_ : URL) -> Void)
+public typealias CompressedFileURL = ((_ : URL?) -> Void)
 
 public class CameraUtil: NSObject {
 
@@ -151,12 +151,15 @@ public class CameraUtil: NSObject {
                     })
                 } catch {
                     print("error on Audio Reader")
+                    handler(nil)
                 }
             } catch {
                 print("error on VideoReader")
+                handler(nil)
             }
         } catch {
             print("error on Video Writer")
+            handler(nil)
         }
     }
 
