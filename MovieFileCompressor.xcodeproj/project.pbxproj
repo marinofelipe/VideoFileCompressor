@@ -16,6 +16,7 @@
 		D5A1593E1EFC499000E5BF19 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D5A1593C1EFC499000E5BF19 /* LaunchScreen.storyboard */; };
 		D5A159461EFC518200E5BF19 /* CameraStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A159451EFC518200E5BF19 /* CameraStatus.swift */; };
 		D5A159481EFC566B00E5BF19 /* CameraUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A159471EFC566B00E5BF19 /* CameraUtil.swift */; };
+		D5B9B45E1F0E704E002D72EF /* VideoAssetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B9B45D1F0E704E002D72EF /* VideoAssetManager.swift */; };
 		D5D5DB651EFD92DB0029E765 /* RecordingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5D5DB641EFD92DB0029E765 /* RecordingButton.swift */; };
 /* End PBXBuildFile section */
 
@@ -32,6 +33,7 @@
 		D5A1593F1EFC499000E5BF19 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D5A159451EFC518200E5BF19 /* CameraStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraStatus.swift; sourceTree = "<group>"; };
 		D5A159471EFC566B00E5BF19 /* CameraUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraUtil.swift; sourceTree = "<group>"; };
+		D5B9B45D1F0E704E002D72EF /* VideoAssetManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoAssetManager.swift; sourceTree = "<group>"; };
 		D5D5DB641EFD92DB0029E765 /* RecordingButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordingButton.swift; sourceTree = "<group>"; };
 		EA7E109806FC30B2CCFC061C /* Pods-MovieFileCompressor.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MovieFileCompressor.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MovieFileCompressor/Pods-MovieFileCompressor.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -87,6 +89,7 @@
 				D5A1593F1EFC499000E5BF19 /* Info.plist */,
 				D5A159451EFC518200E5BF19 /* CameraStatus.swift */,
 				D5A159471EFC566B00E5BF19 /* CameraUtil.swift */,
+				D5B9B45D1F0E704E002D72EF /* VideoAssetManager.swift */,
 				D5D5DB641EFD92DB0029E765 /* RecordingButton.swift */,
 			);
 			path = MovieFileCompressor;
@@ -240,6 +243,7 @@
 			files = (
 				D5A159361EFC499000E5BF19 /* ViewController.swift in Sources */,
 				D5A159341EFC499000E5BF19 /* AppDelegate.swift in Sources */,
+				D5B9B45E1F0E704E002D72EF /* VideoAssetManager.swift in Sources */,
 				D5A159481EFC566B00E5BF19 /* CameraUtil.swift in Sources */,
 				D5D5DB651EFD92DB0029E765 /* RecordingButton.swift in Sources */,
 				D57E46371EFC5EB600B59590 /* MainView.swift in Sources */,

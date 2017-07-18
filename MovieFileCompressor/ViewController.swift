@@ -110,7 +110,9 @@ extension ViewController: AVCaptureFileOutputRecordingDelegate {
                 UISaveVideoAtPathToSavedPhotosAlbum(compressedURL.path, nil, nil, nil)
 
                 DispatchQueue.main.async {
-                    self.showToast(message: "Original file size: \(Double(videoData.length / 1048576)) mb\nCompressed file size: \(Double(compressedData.count / 1048576)) mb", frame: CGRect(x: self.view.frame.size.width/2 - 150, y: self.view.frame.size.height/2 - 100, width: 300, height: 200), lines: 2)
+                    self.showToast(message: "Original file size: \(Double(videoData.length / 1048576)) mb\nCompressed file size: \(Double(compressedData.count / 1048576)) mb",
+                                   frame: CGRect(x: self.view.frame.size.width/2 - 150, y: self.view.frame.size.height/2 - 100,
+                                   width: 300, height: 200), lines: 2)
                 }
             } catch {
                 print("\nerror converting video to low quality")
