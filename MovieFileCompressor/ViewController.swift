@@ -53,8 +53,31 @@ class ViewController: UIViewController {
                     session.commitConfiguration()
                     session.startRunning()
                 })
+            } else if cameraStatus == .denied {
+                self.askForCameraPermission()
             }
         }
+    }
+    
+    private func askForCameraPermission() {
+        let alert = UIAlertController.init(title: "Permission is necessary",
+                                           message: "Allow camera on app settings to enable recording.\nOn permission change the app will reopen.",
+                                           preferredStyle: .alert)
+        let cancel = UIAlertAction.init(title: "Not now", style: .default, handler: { _ in
+            self.setCamera()
+        })
+        let goToSettings = UIAlertAction.init(title: "Settings", style: .default, handler: { _ in
+            if #available(iOS 10.0, *) {
+                UIApplication.shared.open(URL(string: UIApplicationOpenSettingsURLString)!, options: [:], completionHandler: nil)
+            } else {
+                UIApplication.shared.openURL(URL(string: UIApplicationOpenSettingsURLString)!)
+            }
+        })
+        
+        alert.addAction(cancel)
+        alert.addAction(goToSettings)
+        
+        self.present(alert, animated: true, completion: nil)
     }
 }
 
