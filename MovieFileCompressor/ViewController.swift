@@ -113,7 +113,7 @@ extension ViewController: AVCaptureFileOutputRecordingDelegate {
         let compressedURL = NSURL.fileURL(withPath: outputFileURL.path.replacingOccurrences(of: ".mov", with: ".mp4"))
 
         //Using bit rate 900000. Value should be changed to find better file size/frame quality
-        CameraUtil().convertVideoToLowSize(withInputURL: outputFileURL, outputURL: compressedURL, bitRate: 900000, handler: { (compressedURL) in
+        CameraUtil().convertVideoToLowSize(withInputURL: outputFileURL, outputURL: compressedURL, bitRate: .veryHigh, handler: { (compressedURL) in
             do {
                 let compressedData = try Data(contentsOf: compressedURL)
 

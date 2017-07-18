@@ -9,6 +9,17 @@
 import UIKit
 import AVFoundation
 
+// swiftlint:disable identifier_name
+//(bits per second)
+//FIXME: Test and define more accurate values for each level
+public enum BitRate: Int64 {
+    case veryLow = 100000
+    case low = 300000
+    case intermediate = 500000
+    case high = 750000
+    case veryHigh = 1000000
+}
+
 public typealias CameraSession = (
     _ session: AVCaptureSession?,
     _ movieOutput: AVCaptureMovieFileOutput?,
@@ -93,11 +104,11 @@ public class CameraUtil: NSObject {
         return nil
     }
 
-    public func convertVideoToLowSize(withInputURL inputURL: URL, outputURL: URL, bitRate: Int, handler: @escaping CompressedFileURL) {
+    public func convertVideoToLowSize(withInputURL inputURL: URL, outputURL: URL, bitRate: BitRate, handler: @escaping CompressedFileURL) {
         let videoAsset = AVURLAsset(url: inputURL, options: nil)
         let videoTrack = videoAsset.tracks(withMediaType: AVMediaTypeVideo)[0]
         let videoWriterCompressionSettings = [
-            AVVideoAverageBitRateKey: Int(bitRate)
+            AVVideoAverageBitRateKey: Int(bitRate.rawValue)
         ]
         let videoWriterSettings: [String : AnyObject]? = [
             AVVideoCodecKey: AVVideoCodecH264 as AnyObject,
